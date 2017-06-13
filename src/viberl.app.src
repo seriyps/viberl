@@ -1,0 +1,17 @@
+{application, viberl,
+ [{description, "Viber API wrapper"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib,
+    crypto,
+    hackney
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, ["Sergey Prokhorov"]},
+  {licenses, ["Apache 2.0"]},
+  {links, [{"Github", "https://github.com/seriyps/viberl"}]}
+ ]}.
