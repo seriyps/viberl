@@ -105,8 +105,8 @@ api_call(Bot, Method, Body) ->
             ContentType = hackney_headers:parse(<<"content-type">>, Hdrs),
             case {hackney:body(BodyRef), ContentType, Code} of
                 {{ok, <<>>}, _, 200} -> ok;
-                {{ok, Body}, {<<"application">>, <<"json">>, _}, 200} ->
-                    {ok, jiffy:decode(Body, [return_maps])};
+                {{ok, RespBody}, {<<"application">>, <<"json">>, _}, 200} ->
+                    {ok, jiffy:decode(RespBody, [return_maps])};
                 {{error, ErrBody}, _, _} ->
                     {error, hackney_body, ErrBody}
             end;

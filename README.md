@@ -11,7 +11,7 @@ Build
 Cowboy example
 --------------
 
-```
+``` erlang
 -behaviour(cowboy_http_handler).
 
 -export([init/3, handle/2, terminate/3]).
@@ -20,7 +20,7 @@ Cowboy example
 start() ->
     {ok, Token} = application:get_env(viber_bot_token),
     {ok, Port} = application:get_env(viber_bot_port),
-    {ok, Host} = application:get_env(viber_bot_host),
+    {ok, Host} = application:get_env(viber_bot_webhook_host),
     Path = <<"/viber_webhook">>,
     Routes = [
 		{'_', [
@@ -29,7 +29,7 @@ start() ->
         }
     ],
 	{ok, _} = cowboy:start_http(http, 100, [{port, Port}],
-                                [{env, [{dispatch, cowboy_router:compile(Dispatch)}]}]),
+                                [{env, [{dispatch, cowboy_router:compile(Routes)}]}]),
     viberl:set_webhook(Token, <<"https://", Host/binary, Path/binary>>, all).
     
 
@@ -61,14 +61,14 @@ handle_event(Bot, #{<<"event">> := <<"subscribed">>,
                    Bot,
                    #{receiver => Id,
                      type => text,
-                     sender => #{name := ?NAME},
-                     text => <<"Hello, ", Name/binary"! Thanks for subscribing.">>}),
+                     sender => #{name => ?NAME},
+                     text => <<"Hello, ", Name/binary, "! Thanks for subscribing.">>}),
     ok;
 handle_event(Bot, #{<<"event">> := <<"conversation_started">>,
                     <<"user">> :=
                         #{<<"id">> := _Id, <<"name">> := Name}}) ->
     Response = #{type => text,
-                 sender => #{name := ?NAME},
+                 sender => #{name => ?NAME},
                  text => <<"Welcome to ", ?NAME/binary, "! Please, subscribe to continue!">>},
     {reply, jiffy:encode(Response)};
 handle_event(Bot, #{<<"event">> := <<"message">>,
