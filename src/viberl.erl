@@ -9,7 +9,7 @@
 
 -export([api_call/2, api_call/3]).
 
--export([set_webhook/3, remove_webhook/1, handle_webhook_event/3]).
+-export([set_webhook/3, remove_webhook/1, handle_webhook_event/4]).
 -export([send_message/2, get_account_info/1, get_user_details/2, get_online/2, post/2]).
 
 -type bot() :: any().
@@ -67,11 +67,16 @@ set_webhook(Bot, Url, Events) ->
 remove_webhook(Bot) ->
     api_call(Bot, <<"set_webhook">>, #{url => <<>>}).
 
--spec handle_webhook_event(bot(), #{binary() => binary()}, binary()) ->
+-spec handle_webhook_event(bot(),
+                           #{binary() => binary()},
+                           #{binary() => binary()},
+                           binary()) ->
                                   {ok, json_object()} | {error, Type :: atom(), term()}.
-handle_webhook_event(Bot, HttpHeaders, Body) ->
-    case maps:find(<<?SIGNATURE_HEADER_NAME>>, HttpHeaders) of
-        {ok, Signature} ->
+handle_webhook_event(Bot, HttpHeaders, QueryStringParams, Body) ->
+    case get_signature(HttpHeaders, QueryStringParams) of
+        {error, _, _} = Err ->
+            Err;
+        Signature ->
             Token = get_token(Bot),
             ComputedSignature = crypto:hmac(sha256, Token, Body),
             case ComputedSignature == Signature of
@@ -80,15 +85,19 @@ handle_webhook_event(Bot, HttpHeaders, Body) ->
                     parse_webhook_event(Bot, BodyStruct);
                 false ->
                     {error, invalid_signature, {Signature, ComputedSignature}}
-            end;
-        error ->
-            {error, missing_signature, <<?SIGNATURE_HEADER_NAME>>}
+            end
     end.
 
 parse_webhook_event(_Bot, #{<<"event">> := _,
                             <<"timestamp">> := _,
                             <<"message_token">> := _} = Body) ->
     {ok, Body}.
+
+get_signature(#{<<?SIGNATURE_HEADER_NAME>> := Sig}, _) -> Sig;
+get_signature(_, #{<<"sig">> := Sig}) -> Sig;
+get_signature(HttpHeaders, QS) ->
+    {error, missing_signature, {HttpHeaders, QS}}.
+
 
 -spec api_call(bot(), method()) -> api_response().
 api_call(Bot, Method) ->

@@ -38,16 +38,18 @@ init(_Transport, Req, [BotToken]) ->
 
 handle(Req, Bot) ->
     {AuthToken, Req1} = cowboy_req:header(<<"x-viber-auth-token">>, Req),
-    {Body, Req2} = cowboy_req:body(Req1),
+    {QSVals, Req2} = cowboy_req:header(<<"x-viber-auth-token">>, Req1),
+    QSMap = maps:from_list(QSVals),
+    {ok, Body, Req3} = cowboy_req:body(Req2),
     {ok, Event} = viberl:handle_webhook_event(
-        Bot, #{<<"x-viber-auth-token">> => AuthToken}, Body),
+        Bot, #{<<"x-viber-auth-token">> => AuthToken}, QSMap, Body),
     case handle_event(Bot, Event) of
         ok ->
-            {ok, Req2, Bot};
+            {ok, Req3, Bot};
         {reply, Body} ->
             Headers = [{<<"content-type">>, <<"application/json">>}],
-            {ok, Req3} = cowboy_req:reply(200, Headers, Body, Req2),
-            {ok, Req3, Bot}
+            {ok, Req4} = cowboy_req:reply(200, Headers, Body, Req3),
+            {ok, Req4, Bot}
     end.
         
 
