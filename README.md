@@ -30,25 +30,25 @@ start() ->
     ],
 	{ok, _} = cowboy:start_http(http, 100, [{port, Port}],
                                 [{env, [{dispatch, cowboy_router:compile(Routes)}]}]),
+    ok = hackney_pool:start_pool(viberl, [{timeout, 60000}, {max_connections, 30}]),
     viberl:set_webhook(Token, <<"https://", Host/binary, Path/binary>>, all).
     
-
 init(_Transport, Req, [BotToken]) ->
     {ok, Req, BotToken}.
 
 handle(Req, Bot) ->
-    {AuthToken, Req1} = cowboy_req:header(<<"x-viber-auth-token">>, Req),
-    {QSVals, Req2} = cowboy_req:header(<<"x-viber-auth-token">>, Req1),
-    QSMap = maps:from_list(QSVals),
+    {Headers, Req1} = cowboy_req:headers(Req),
+    {QSVals, Req2} = cowboy_req:qs_vals(Req1),
     {ok, Body, Req3} = cowboy_req:body(Req2),
     {ok, Event} = viberl:handle_webhook_event(
-        Bot, #{<<"x-viber-auth-token">> => AuthToken}, QSMap, Body),
+        Bot, maps:from_list(Headers), maps:from_list(QSVals), Body),
     case handle_event(Bot, Event) of
         ok ->
-            {ok, Req3, Bot};
-        {reply, Body} ->
-            Headers = [{<<"content-type">>, <<"application/json">>}],
-            {ok, Req4} = cowboy_req:reply(200, Headers, Body, Req3),
+            {ok, Req4} = cowboy_req:reply(200, Req3),
+            {ok, Req4, Bot};
+        {reply, RespBody} ->
+            RespHeaders = [{<<"content-type">>, <<"application/json">>}],
+            {ok, Req4} = cowboy_req:reply(200, RespHeaders, RespBody, Req3),
             {ok, Req4, Bot}
     end.
         
@@ -66,9 +66,9 @@ handle_event(Bot, #{<<"event">> := <<"subscribed">>,
                      sender => #{name => ?NAME},
                      text => <<"Hello, ", Name/binary, "! Thanks for subscribing.">>}),
     ok;
-handle_event(Bot, #{<<"event">> := <<"conversation_started">>,
+handle_event(_Bot, #{<<"event">> := <<"conversation_started">>,
                     <<"user">> :=
-                        #{<<"id">> := _Id, <<"name">> := Name}}) ->
+                         #{<<"id">> := _Id, <<"name">> := _Name}}) ->
     Response = #{type => text,
                  sender => #{name => ?NAME},
                  text => <<"Welcome to ", ?NAME/binary, "! Please, subscribe to continue!">>},
@@ -76,13 +76,14 @@ handle_event(Bot, #{<<"event">> := <<"conversation_started">>,
 handle_event(Bot, #{<<"event">> := <<"message">>,
                     <<"sender">> := #{<<"id">> := Id},
                     <<"message">> := #{<<"type">> := Type} = Message}) ->
-    Message1 = message:without([<<"type">>], Message),
+    Message1 = maps:without([<<"type">>], Message),
     Message2 = Message1#{receiver => Id,
                          type => Type,
                          sender => #{name => ?NAME}},
     {ok, _} = viberl:send_message(Bot, Message2),
     ok;
-handle_event(Bot, #{<<"event">> := Event}) ->
+handle_event(_Bot, #{<<"event">> := Event}) ->
     lager:info("Unhandled event ~s", [Event]),
     ok.
+
 ```
