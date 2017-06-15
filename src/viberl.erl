@@ -79,12 +79,13 @@ handle_webhook_event(Bot, HttpHeaders, QueryStringParams, Body) ->
         Signature ->
             Token = get_token(Bot),
             ComputedSignature = crypto:hmac(sha256, Token, Body),
-            case ComputedSignature == Signature of
+            BinSignature = unhex(Signature),
+            case ComputedSignature == BinSignature of
                 true ->
                     BodyStruct = jiffy:decode(Body, [return_maps]),
                     parse_webhook_event(Bot, BodyStruct);
                 false ->
-                    {error, invalid_signature, {Signature, ComputedSignature}}
+                    {error, invalid_signature, {BinSignature, ComputedSignature}}
             end
     end.
 
@@ -133,3 +134,10 @@ do_api_call(Url, Token, Payload) when is_map(Payload) ->
 
 get_token(Bot) ->
     Bot.
+
+
+%% hex(Bin) ->
+%%     << (erlang:integer_to_binary(N, 16)) || <<N:4>> <= Bin >>.
+
+unhex(Hex) ->
+    << <<(erlang:binary_to_integer(<<C>>, 16)):4/integer>> || <<C:8>> <= Hex >>.
