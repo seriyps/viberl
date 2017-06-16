@@ -9,7 +9,8 @@
 
 -export([api_call/2, api_call/3]).
 
--export([set_webhook/3, remove_webhook/1, handle_webhook_event/4]).
+-export([set_webhook/3, remove_webhook/1, handle_webhook_event/4,
+         get_event_user_id/1]).
 -export([send_message/2, get_account_info/1, get_user_details/2, get_online/2, post/2]).
 
 -type bot() :: any().
@@ -99,6 +100,10 @@ get_signature(_, #{<<"sig">> := Sig}) -> Sig;
 get_signature(HttpHeaders, QS) ->
     {error, missing_signature, {HttpHeaders, QS}}.
 
+get_event_user_id(#{<<"user">> := #{<<"id">> := Id}}) -> Id;
+get_event_user_id(#{<<"user_id">> := Id}) -> Id;
+get_event_user_id(#{<<"sender">> := #{<<"id">> := Id}}) -> Id;
+get_event_user_id(#{<<"event">> := <<"webhook">>}) -> undefined.
 
 -spec api_call(bot(), method()) -> api_response().
 api_call(Bot, Method) ->
