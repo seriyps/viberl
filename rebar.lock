@@ -1,24 +1,22 @@
 {"1.1.0",
-[{<<"certifi">>,{pkg,<<"certifi">>,<<"1.2.1">>},1},
- {<<"hackney">>,
-  {git,"https://github.com/benoitc/hackney.git",
-       {ref,"359c0008059125dc56bd791530910d814005a6a0"}},
-  0},
- {<<"idna">>,{pkg,<<"idna">>,<<"5.0.2">>},1},
- {<<"jiffy">>,
-  {git,"https://github.com/davisp/jiffy.git",
-       {ref,"06aaf440e091c9fd5f8aea557ac760a33bd37130"}},
-  0},
+[{<<"certifi">>,{pkg,<<"certifi">>,<<"2.5.1">>},1},
+ {<<"hackney">>,{pkg,<<"hackney">>,<<"1.15.2">>},0},
+ {<<"idna">>,{pkg,<<"idna">>,<<"6.0.0">>},1},
+ {<<"jiffy">>,{pkg,<<"jiffy">>,<<"1.0.4">>},0},
  {<<"metrics">>,{pkg,<<"metrics">>,<<"1.0.1">>},1},
- {<<"mimerl">>,{pkg,<<"mimerl">>,<<"1.0.2">>},1},
- {<<"ssl_verify_fun">>,{pkg,<<"ssl_verify_fun">>,<<"1.1.1">>},1},
- {<<"unicode_util_compat">>,{pkg,<<"unicode_util_compat">>,<<"0.2.0">>},2}]}.
+ {<<"mimerl">>,{pkg,<<"mimerl">>,<<"1.2.0">>},1},
+ {<<"parse_trans">>,{pkg,<<"parse_trans">>,<<"3.3.0">>},2},
+ {<<"ssl_verify_fun">>,{pkg,<<"ssl_verify_fun">>,<<"1.1.5">>},1},
+ {<<"unicode_util_compat">>,{pkg,<<"unicode_util_compat">>,<<"0.4.1">>},2}]}.
 [
 {pkg_hash,[
- {<<"certifi">>, <<"C3904F192BD5284E5B13F20DB3CEAC9626E14EEACFBB492E19583CF0E37B22BE">>},
- {<<"idna">>, <<"AC203208ADA855D95DC591A764B6E87259CB0E2A364218F215AD662DAA8CD6B4">>},
+ {<<"certifi">>, <<"867CE347F7C7D78563450A18A6A28A8090331E77FA02380B4A21962A65D36EE5">>},
+ {<<"hackney">>, <<"07E33C794F8F8964EE86CEBEC1A8ED88DB5070E52E904B8F12209773C1036085">>},
+ {<<"idna">>, <<"689C46CBCDF3524C44D5F3DDE8001F364CD7608A99556D8FBD8239A5798D4C10">>},
+ {<<"jiffy">>, <<"72ADEFF75C52A2FF07DE738F0813768ABE7CE158026CC1115A170340259C0CAA">>},
  {<<"metrics">>, <<"25F094DEA2CDA98213CECC3AEFF09E940299D950904393B2A29D191C346A8486">>},
- {<<"mimerl">>, <<"993F9B0E084083405ED8252B99460C4F0563E41729AB42D9074FD5E52439BE88">>},
- {<<"ssl_verify_fun">>, <<"28A4D65B7F59893BC2C7DE786DEC1E1555BD742D336043FE644AE956C3497FBE">>},
- {<<"unicode_util_compat">>, <<"DBBCCF6781821B1C0701845EAF966C9B6D83D7C3BFC65CA2B78B88B8678BFA35">>}]}
+ {<<"mimerl">>, <<"67E2D3F571088D5CFD3E550C383094B47159F3EEE8FFA08E64106CDF5E981BE3">>},
+ {<<"parse_trans">>, <<"09765507A3C7590A784615CFD421D101AEC25098D50B89D7AA1D66646BC571C1">>},
+ {<<"ssl_verify_fun">>, <<"6EAF7AD16CB568BB01753DBBD7A95FF8B91C7979482B95F38443FE2C8852A79B">>},
+ {<<"unicode_util_compat">>, <<"D869E4C68901DD9531385BB0C8C40444EBF624E60B6962D95952775CAC5E90CD">>}]}
 ].
