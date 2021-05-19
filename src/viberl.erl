@@ -79,7 +79,7 @@ handle_webhook_event(Bot, HttpHeaders, QueryStringParams, Body) ->
             Err;
         Signature ->
             Token = get_token(Bot),
-            ComputedSignature = crypto:hmac(sha256, Token, Body),
+            ComputedSignature = hmac(sha256, Token, Body),
             BinSignature = unhex(Signature),
             case ComputedSignature == BinSignature of
                 true ->
@@ -89,6 +89,14 @@ handle_webhook_event(Bot, HttpHeaders, QueryStringParams, Body) ->
                     {error, invalid_signature, {BinSignature, ComputedSignature}}
             end
     end.
+
+-if(?OTP_RELEASE >= 23).
+hmac(Alg, Key, Data) ->
+    crypto:mac(hmac, Alg, Key, Data).
+-else.
+hmac(Alg, Key, Data) ->
+    crypto:hmac(Alg, Key, Data).
+-endif.
 
 parse_webhook_event(_Bot, #{<<"event">> := _,
                             <<"timestamp">> := _,
